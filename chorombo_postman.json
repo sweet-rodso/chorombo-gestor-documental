@@ -1,0 +1,152 @@
+{
+  "info": {
+    "name": "Gestor Documental - Escuela G-733 Chorombo Bajo",
+    "_postman_id": "chorombo-api-u3-2026",
+    "description": "Coleccion de endpoints CRUD del Gestor Documental. Desarrollo Backend IF201IINF - Evaluacion U3.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost/chorombo-backend/public", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Tipos de Documento",
+      "item": [
+        {
+          "name": "Listar Tipos de Documento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/api/tipos-documento", "host": ["{{base_url}}"], "path": ["api", "tipos-documento"] },
+            "description": "Retorna el catalogo completo de tipos documentales disponibles."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK", "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"lang\": \"esp\", \"status\": \"success\", \"code\": 200, \"total\": 6,\n  \"data\": [\n    { \"id\": 1, \"codigo\": \"memo\", \"nombre\": \"Memo\" },\n    { \"id\": 2, \"codigo\": \"oficio\", \"nombre\": \"Oficio\" }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Documentos",
+      "item": [
+        {
+          "name": "Listar Documentos",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/documentos?pagina=1&por_pagina=10", "host": ["{{base_url}}"], "path": ["api", "documentos"], "query": [{"key":"pagina","value":"1"},{"key":"por_pagina","value":"10"}] },
+            "description": "Lista documentos paginados. Filtro opcional: ?tipo=memo"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK", "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"lang\": \"esp\", \"status\": \"success\", \"code\": 200, \"total\": 6,\n  \"meta\": { \"total\": 6, \"pagina\": 1, \"por_pagina\": 10, \"paginas\": 1 },\n  \"data\": [ { \"id\": 6, \"titulo\": \"Permiso administrativo - Docente Ana Lopez\", \"fecha\": \"2026-08-15\", \"tipo_documento\": { \"codigo\": \"permiso_administrativo\", \"nombre\": \"Permiso Administrativo\" } } ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Listar Documentos filtrados por tipo",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/documentos?tipo=memo", "host": ["{{base_url}}"], "path": ["api", "documentos"], "query": [{"key":"tipo","value":"memo"}] }
+          },
+          "response": []
+        },
+        {
+          "name": "Ver Documento por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/documentos/1", "host": ["{{base_url}}"], "path": ["api", "documentos", "1"] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK", "code": 200,
+              "body": "{\n  \"lang\": \"esp\", \"status\": \"success\", \"code\": 200,\n  \"data\": { \"id\": 1, \"titulo\": \"Memo N 12 - Suspension de clases por mantencion electrica\", \"fecha\": \"2026-08-10\", \"tipo_documento\": { \"codigo\": \"memo\", \"nombre\": \"Memo\" } }\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "status": "Not Found", "code": 404,
+              "body": "{\n  \"lang\": \"esp\", \"status\": \"error\", \"code\": 404, \"message\": \"Documento con ID 999 no encontrado.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear Documento",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Memo N 13 - Reunion de apoderados\",\n  \"tipo_documento_id\": 1,\n  \"fecha\": \"2026-09-01\",\n  \"descripcion\": \"Convocatoria a reunion de apoderados de todos los cursos.\",\n  \"archivo_referencia\": \"memo_013_2026.pdf\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/documentos", "host": ["{{base_url}}"], "path": ["api", "documentos"] }
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created", "code": 201,
+              "body": "{\n  \"lang\": \"esp\", \"status\": \"success\", \"code\": 201,\n  \"message\": \"Documento creado exitosamente.\",\n  \"data\": { \"id\": 7, \"titulo\": \"Memo N 13 - Reunion de apoderados\", \"fecha\": \"2026-09-01\" }\n}"
+            },
+            {
+              "name": "422 Validacion",
+              "status": "Unprocessable Entity", "code": 422,
+              "body": "{\n  \"lang\": \"esp\", \"status\": \"error\", \"code\": 422,\n  \"message\": \"Datos de entrada invalidos.\",\n  \"errors\": [\"El campo \\\"titulo\\\" es obligatorio.\"]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Actualizar Documento (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Memo N 13 - Reunion de apoderados (reprogramada)\",\n  \"tipo_documento_id\": 1,\n  \"fecha\": \"2026-09-05\",\n  \"descripcion\": \"Reunion reprogramada por solicitud de la directora.\",\n  \"archivo_referencia\": \"memo_013_2026_v2.pdf\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/documentos/7", "host": ["{{base_url}}"], "path": ["api", "documentos", "7"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Documento parcial (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Se adjunta nueva version del documento.\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/documentos/7", "host": ["{{base_url}}"], "path": ["api", "documentos", "7"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Documento",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/api/documentos/7", "host": ["{{base_url}}"], "path": ["api", "documentos", "7"] }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK", "code": 200,
+              "body": "{\n  \"lang\": \"esp\", \"status\": \"success\", \"code\": 200,\n  \"message\": \"Documento con ID 7 eliminado exitosamente.\"\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "status": "Not Found", "code": 404,
+              "body": "{\n  \"lang\": \"esp\", \"status\": \"error\", \"code\": 404, \"message\": \"Documento con ID 999 no encontrado.\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
